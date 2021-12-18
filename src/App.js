@@ -10,14 +10,20 @@ function App() {
     provider: null,
     web3: null
   });
+
+  const [loading, setLoading] = useState(true)
+
   useEffect(() => {
+
+
     const loadProvider = async () => {
+
       //const provider = await detectEthereumProvider();
       const provider = new Web3.providers.HttpProvider('http://localhost:7545');
       var web3Instance = new Web3(provider);
 
       if (provider) {
-        //providerChanged(provider);
+        providerChanged(provider);
         setWeb3Api({
           provider,
           web3: web3Instance
@@ -30,20 +36,30 @@ function App() {
     loadProvider();
   }, [])
 
-
+  // load accounts && set current account
   const [account, setAccount] = useState(null)
+
   useEffect(() => {
-    const loadAccounts = async () => {
-      const accounts = await web3Api.web3.eth.getAccounts();
-      setAccount(accounts[0]);
+    async function onInit() {
+      await window.ethereum.enable();
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const account = accounts[0];
+      console.log(account)
+      setAccount(account);
+
+      window.ethereum.on('accountsChanged', function (accounts) {
+        // Time to reload your interface with accounts[0]!
+        console.log(accounts[0])
+      });
     }
-    web3Api.web3 && loadAccounts();
+
+    onInit();
   })
 
   // load contract
   const providerChanged = (provider) => {
-    provider.on("accountsChanged", _ => window.location.reload());
-    provider.on("chainChanged", _ => window.location.reload());
+    window.ethereum.on("accountsChanged", _ => window.location.reload());
+    window.ethereum.on("chainChanged", _ => window.location.reload());
 
   }
 
@@ -89,20 +105,39 @@ function App() {
 
     if (productInputs.name && productInputs.price && productInputs.description) {
       const priceInWei = Web3.utils.toWei(productInputs.price, "ether");
-      const balance = await web3Api.web3.eth.getBalance(account)
-      console.log(`account===in send==${account}`);
-      console.log(`balance===in send=======`);
-      console.log(balance);
+      // const balance = await web3Api.web3.eth.getBalance(account)
 
       const addProduct = await contract.methods.createShopProduct(productInputs.name, priceInWei, productInputs.description).send({ from: account, gas: 3000000 });
       alert('Product added successfully');
       loadContracts();
-      // window.location.reload();
-
     }
     else {
       window.alert("Please fill all inputs");
     }
+
+  }
+
+  const [productsItem, setProductsItem] = useState([])
+
+  useEffect(() => {
+    loadProducts();
+  }, [productsCount])
+
+  const loadProducts = async () => {
+    for (let i = 1; i <= productsCount; i++) {
+      const product = await contract.methods.shopProducts(i).call();
+      setProductsItem(productsItem => [...productsItem, product]);
+    }
+
+    setLoading(false);
+  }
+
+  const buyProduct = async (id, price) => {
+    console.log(`buyproduct account====${account}`);
+    let res = await contract.methods.PurchasedShopProduct(id).send({ from: account, value: price, gas: 3000000 })
+    console.log(res);
+
+    alert("Buy success");
 
   }
 
@@ -119,15 +154,23 @@ function App() {
       </nav>
 
       <div>
+        <div className='row justify-content-center p-2'>
+          <div className="col-3 h6">
+            Current address:
+          </div>
+          <div className="justify-content-left">
+            {account}
+          </div>
+        </div>
         <div className='row justify-content-center'>
-          <div className="col-3">
+
+          <div className="col-3 h6">
             Products count:
           </div>
           <div className="justify-content-left">
             {productsCount}
           </div>
         </div>
-
 
         <h3>Add your product</h3>
         <div className="product-inputs container">
@@ -150,8 +193,38 @@ function App() {
           <button type="button" className="btn btn-success p-2 m-3" onClick={addProduct}>Add Product</button>
 
         </div>
+
+        <div className='product-items'>
+          <h3>Products</h3>
+          {loading ? <p>Loading...</p> :
+            productsItem.map((item, index) => {
+              return (
+
+                <div className='container' key={item.id}>
+                  <div className="card m-5" >
+                    <div className="card-header">
+                      Product name: {item.name}
+                    </div>
+                    <div className="card-body">
+                      <h5 className="card-title">Price: {Web3.utils.fromWei(item.price, "ether")} Ether</h5>
+                      <p className="card-text">Description: {item.description}</p>
+                      <p className="card-text">The seller address: {item.owner}</p>
+
+                      <button type="button" className="btn btn-success p-2 m-3" onClick={() => { buyProduct(item.id, item.price) }} >Buy</button>
+
+                    </div>
+                  </div>
+                </div>
+
+              )
+            })
+          }
+
+        </div>
       </div>
-    </div>
+
+
+    </div >
   );
 }
 

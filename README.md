@@ -6,9 +6,11 @@ then \
 truffle compile \
 truffle migrate --reset \
 
-# Sample screen
+# Sample screens
 
-<img src="/images/Add product.PNG" alt="Sample"/>
+<img src="/images/Add product.PNG" alt="Add product"/>
+
+<img src="/images/Sample product.PNG" alt="Sample product"/>
 
 # Getting Started with Create React App
 
