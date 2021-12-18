@@ -122,11 +122,17 @@ function App() {
       </nav>
 
       <div>
-        <h1>
-          {productsCount}
-        </h1>
+        <div className='row justify-content-center'>
+          <div class="col-3">
+            Products count:
+          </div>
+          <div class="justify-content-left">
+            {productsCount}
+          </div>
+        </div>
 
-        <h1>Add your product</h1>
+
+        <h3>Add your product</h3>
         <div className="product-inputs container">
           <div className="input-group mb-3">
             <span className="input-group-text" id="inputGroup-sizing-default">Product name</span>
