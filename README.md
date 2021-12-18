@@ -1,7 +1,6 @@
 # Getting Started with contracts
 
-truffle compile
-->then->
+truffle compile .\
 truffle migrate --reset
 
 # Getting Started with Create React App
