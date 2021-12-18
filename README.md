@@ -8,7 +8,6 @@ truffle migrate --reset \
 
 # Sample screen
 
-![Sample](/images/Add product.PNG)
 <img src="/images/Add product.PNG" alt="Sample"/>
 
 # Getting Started with Create React App
