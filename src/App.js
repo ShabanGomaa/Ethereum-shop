@@ -22,7 +22,6 @@ function App() {
           provider,
           web3: web3Instance
         })
-        console.log(provider);
       }
       else {
         window.alert("Please install Metamask wallet or any another wallet");
@@ -36,13 +35,7 @@ function App() {
   useEffect(() => {
     const loadAccounts = async () => {
       const accounts = await web3Api.web3.eth.getAccounts();
-
-      setAccount(accounts[3]);
-      console.log(`${account}`);
-      web3Api.web3.eth.defaultAccount = account
-      console.log(`web3.eth.defaultAccount===${account}`);
-
-      // console.log(eth);
+      setAccount(accounts[0]);
     }
     web3Api.web3 && loadAccounts();
   })
@@ -57,33 +50,33 @@ function App() {
   const [contract, setContract] = useState()
   const [productsCount, setProductsCount] = useState();
 
-  useEffect(() => {
-    const loadContracts = async () => {
-      const contractFile = await fetch('/abis/Shop.json');
-      const toJson = await contractFile.json();
+  const loadContracts = async () => {
+    const contractFile = await fetch('/abis/Shop.json');
+    const toJson = await contractFile.json();
 
-      // the abi
-      const abi = toJson.abi;
-      const networkId = await web3Api.web3.eth.net.getId();
-      console.log(`networkId=${networkId}`);
+    // the abi
+    const abi = toJson.abi;
+    const networkId = await web3Api.web3.eth.net.getId();
+    const networkObject = toJson.networks[networkId];
+    if (networkObject) {
+      const contractAddress = networkObject.address;
 
-      const networkObject = toJson.networks[networkId];
-      if (networkObject) {
-        const contractAddress = networkObject.address;
+      const deployedContract = await new web3Api.web3.eth.Contract(abi, contractAddress);
+      setContract(deployedContract);
 
-        const deployedContract = await new web3Api.web3.eth.Contract(abi, contractAddress);
-        setContract(deployedContract);
-
-        const _productsCount = await deployedContract.methods.count().call();
-        setProductsCount(_productsCount);
-
-      }
-      else {
-        console.log(`Please connect your wallet with ganache`);
-        window.alert(`Please connect your wallet with ganache`);
-      }
+      const _productsCount = await deployedContract.methods.count().call();
+      setProductsCount(_productsCount);
 
     }
+    else {
+      console.log(`Please connect your wallet with ganache`);
+      window.alert(`Please connect your wallet with ganache`);
+    }
+
+  }
+
+  useEffect(() => {
+
     web3Api.web3 && loadContracts();
   }, [web3Api.web3])
 
@@ -93,14 +86,18 @@ function App() {
 
   // Add products
   const addProduct = async () => {
-    console.log(`productInputs.name=${productInputs.name}, productInputs.price=${productInputs.price}, productInputs.description=${productInputs.description}`);
-    const priceInWei = Web3.utils.toWei(productInputs.price, "ether");
 
-    if (productInputs.name && priceInWei && productInputs.description) {
+    if (productInputs.name && productInputs.price && productInputs.description) {
+      const priceInWei = Web3.utils.toWei(productInputs.price, "ether");
+      const balance = await web3Api.web3.eth.getBalance(account)
       console.log(`account===in send==${account}`);
+      console.log(`balance===in send=======`);
+      console.log(balance);
 
-      const addProduct = await contract.methods.createShopProduct(productInputs.name, priceInWei, productInputs.description).send({ from: account });
-      window.location.reload();
+      const addProduct = await contract.methods.createShopProduct(productInputs.name, priceInWei, productInputs.description).send({ from: account, gas: 3000000 });
+      alert('Product added successfully');
+      loadContracts();
+      // window.location.reload();
 
     }
     else {
@@ -123,10 +120,10 @@ function App() {
 
       <div>
         <div className='row justify-content-center'>
-          <div class="col-3">
+          <div className="col-3">
             Products count:
           </div>
-          <div class="justify-content-left">
+          <div className="justify-content-left">
             {productsCount}
           </div>
         </div>
@@ -140,8 +137,9 @@ function App() {
           </div>
 
           <div className="input-group mb-3">
-            <span className="input-group-text">Eth</span>
+            <span className="input-group-text">Ether value</span>
             <input type="text" className="form-control" aria-label="Amount (to the nearest dollar)" onChange={e => setProductInputs({ ...productInputs, price: e.target.value })} />
+            <span className='input-group-text'>Eth</span>
           </div>
 
           <div className="input-group">
