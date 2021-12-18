@@ -2,9 +2,8 @@
 
 Check contracts at folder "contracts" \
 Main contract at: "contracts\Shop.sol" \
-then \
 truffle compile \
-truffle migrate --reset \
+truffle migrate --reset
 
 # Sample screens
 
