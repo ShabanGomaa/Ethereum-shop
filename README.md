@@ -12,12 +12,12 @@ truffle migrate --reset \
 <img src="/images/Add product.PNG" alt="Add product"/>
 <img src="/images/Sample product.PNG" alt="Sample product"/>
 
-# Please find my wallets below if you get any benefits from my projects, so that I can keep on bringing up such FREE projects/information for the community...
+Please find my wallets below if you get any benefits from my projects, so that I can keep on bringing up such FREE projects/information for the community...
 
-ETH -> ERC20 -> 0x651717d38275b5fa21d3a5262bf7af8baf32903c
-ETH -> TRC20 -> TX5SoJ6uUPfAjE4t5FPjVpHfakUNzZKs6f
-USDT -> ERC20 -> 0x51b240696582a9011804ade98c7ba5fe3865c5c9
-USDT -> TRC20 -> TX5SoJ6uUPfAjE4t5FPjVpHfakUNzZKs6f
+ETH -> ERC20 -> 0x651717d38275b5fa21d3a5262bf7af8baf32903c \
+ETH -> TRC20 -> TX5SoJ6uUPfAjE4t5FPjVpHfakUNzZKs6f \
+USDT -> ERC20 -> 0x51b240696582a9011804ade98c7ba5fe3865c5c9 \
+USDT -> TRC20 -> TX5SoJ6uUPfAjE4t5FPjVpHfakUNzZKs6f \
 
 # Getting Started with Create React App
 
